@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Restaurante · Mesas y reservaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#eff3f1;--surface:#fff;--ink:#13262b;--muted:#586c70;--line:#d3ddda;--brand:#1d6b5f;--brand-dark:#14463e;--berry:#b02a4f;--amber-bg:#f7ebd0;--amber-ink:#7a4f0c;--ok-bg:#dcefe9;--no-bg:#f3d9e0;--no-ink:#7c1733;--display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;--body:'Instrument Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.5}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0 0 12px}
+h1{font-size:2rem;font-weight:700}h2{font-size:1.25rem;font-weight:700}h3{font-size:1.05rem;font-weight:700}
+p{margin:0 0 12px}
+.suave{color:var(--muted)}.nota{margin-bottom:20px}.txt-ok{color:var(--brand)}.txt-no{color:var(--berry)}
+.solo-lector{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--berry);outline-offset:2px}
+.topbar{background:var(--brand-dark);color:#fff}
+.topbar-in{max-width:1100px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.marca{font-family:var(--display);font-weight:700;font-size:1.3rem;margin-right:8px}
+.topbar nav{display:flex;gap:4px;flex:1}
+.nav-btn{background:none;border:0;border-bottom:3px solid transparent;color:#cfe3de;font:inherit;font-weight:500;padding:8px 10px;cursor:pointer}
+.nav-btn:hover{color:#fff}.nav-btn[aria-current='page']{color:#fff;border-bottom-color:#fff}
+.usuario{display:flex;align-items:center;gap:10px}.usuario-correo{font-size:.9rem;color:#cfe3de}
+.rol{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:999px;background:#fff;color:var(--brand-dark)}
+.rol.admin{background:#ffd9e2;color:var(--no-ink)}
+.contenedor{max-width:1100px;margin:0 auto;padding:28px 24px 60px}
+.titulo-fila{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.titulo-fila h1{margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:24px}
+.campo{margin-bottom:14px}.campo label{display:block;font-size:.875rem;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid #aebcb9;border-radius:8px;padding:9px 11px}
+input[type='checkbox']{width:auto}
+.check{display:flex;align-items:center;gap:8px;font-size:.95rem;margin-bottom:14px}
+.fila-form{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
+.fila-form .campo{margin-bottom:0;flex:1 1 140px;min-width:120px}.fila-form .check{margin-bottom:10px}
+.acciones-form{display:flex;gap:10px;flex:1 1 100%}
+.btn{font:inherit;font-weight:600;background:var(--brand);color:#fff;border:2px solid var(--brand);border-radius:8px;padding:9px 18px;cursor:pointer}
+.btn:hover{background:var(--brand-dark);border-color:var(--brand-dark)}.btn:disabled{opacity:.6;cursor:wait}
+.btn.sec{background:transparent;color:var(--brand-dark);border-color:var(--brand)}.btn.sec:hover{background:var(--ok-bg)}
+.btn.peligro{background:transparent;color:var(--berry);border-color:var(--berry)}.btn.peligro:hover{background:var(--no-bg)}
+.btn.chico{padding:4px 12px;font-size:.875rem}.btn.ancho{width:100%;margin-top:4px}
+.enlace{background:none;border:0;color:var(--brand);font:inherit;text-decoration:underline;cursor:pointer;padding:8px 0 0}
+.error-form{color:var(--no-ink);background:var(--no-bg);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.aviso{position:fixed;top:16px;right:16px;z-index:10;max-width:min(420px,calc(100vw - 32px));padding:12px 16px;border-radius:10px;font-weight:500;box-shadow:0 6px 20px rgba(19,38,43,.18)}
+.aviso.ok{background:var(--brand-dark);color:#fff}.aviso.error{background:var(--berry);color:#fff}
+.login-pagina{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-caja{width:100%;max-width:400px;margin:0;padding:32px}.login-caja h1{font-size:1.75rem}
+.marca-mesas{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.forma{display:block;border:2px solid var(--brand);background:var(--ok-bg)}
+.forma.chica{width:28px;height:28px;border-radius:50%}.forma.media{width:32px;height:32px;border-radius:8px}.forma.grande{width:52px;height:30px;border-radius:8px}
+.leyenda{display:flex;gap:18px;list-style:none;margin:0;padding:0;font-size:.9rem;color:var(--muted)}
+.leyenda li{display:flex;align-items:center;gap:8px}
+.muestra{width:18px;height:18px;border-radius:50%;border:2px solid var(--brand);background:#fff}
+.muestra.no{border-color:#9aa9ac;background:repeating-linear-gradient(135deg,#eef1f0,#eef1f0 3px,#dde4e2 3px,#dde4e2 6px)}
+.mesas-layout{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+.plano{display:flex;flex-wrap:wrap;align-items:center;gap:26px;padding:32px;min-height:240px;border:1px solid var(--line);border-radius:14px;background-color:#f8faf9;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px}
+.mesa{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface);color:var(--ink);border:2px solid var(--brand);font-family:var(--display);cursor:pointer;padding:0}
+.mesa.chica{width:92px;height:92px;border-radius:50%}.mesa.media{width:108px;height:108px;border-radius:20px}.mesa.grande{width:176px;height:100px;border-radius:20px}
+.mesa strong{font-size:1.6rem;line-height:1}.mesa small{font-family:var(--body);font-size:.75rem;color:var(--muted)}
+.mesa:hover{background:var(--ok-bg)}
+.mesa.no{border-color:#9aa9ac;color:var(--muted);background:repeating-linear-gradient(135deg,#eef1f0,#eef1f0 6px,#e1e7e5 6px,#e1e7e5 12px)}
+.mesa[aria-pressed='true']{outline:3px solid var(--berry);outline-offset:3px}
+.detalle{margin-bottom:0;position:sticky;top:16px}
+.editar{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.vacio{text-align:center;padding:36px 20px}
+.filtros{display:flex;gap:6px;flex-wrap:wrap}
+.filtro{font:inherit;font-size:.9rem;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 14px;cursor:pointer}
+.filtro[aria-pressed='true']{background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
+.tabla-envoltura{padding:0;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-size:.875rem;font-weight:600;color:var(--muted);padding:12px 16px;border-bottom:1px solid var(--line)}
+td{padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+.acciones{display:flex;gap:8px;justify-content:flex-end}
+.estado{font-size:.85rem;font-weight:600;padding:3px 12px;border-radius:999px}
+.estado.pendiente{background:var(--amber-bg);color:var(--amber-ink)}
+.estado.confirmada{background:var(--ok-bg);color:var(--brand-dark)}
+.estado.cancelada{background:var(--no-bg);color:var(--no-ink)}
+@media(max-width:800px){.mesas-layout{grid-template-columns:1fr}.detalle{position:static}.usuario-correo{display:none}.plano{padding:20px;gap:18px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.2/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React
+
+/* ========== API ========== */
+const API = 'http://localhost:3000/api/v1'
+
+const getToken = () => localStorage.getItem('token')
+const setToken = (t) => localStorage.setItem('token', t)
+const clearToken = () => localStorage.removeItem('token')
+
+async function request(path, { method = 'GET', body } = {}) {
+  const headers = {}
+  if (body) headers['Content-Type'] = 'application/json'
+  const token = getToken()
+  if (token) headers.Authorization = `Bearer ${token}`
+
+  let res
+  try {
+    res = await fetch(`${API}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined })
+  } catch {
+    throw new Error('No se pudo conectar con el servidor. Revisa que la API esté corriendo y que tenga CORS activado.')
+  }
+
+  const texto = await res.text()
+  let datos = null
+  try { datos = texto ? JSON.parse(texto) : null } catch { datos = null }
+
+  if (!res.ok) {
+    const err = new Error(datos?.error || datos?.message || `El servidor respondió con error ${res.status}.`)
+    err.status = res.status
+    throw err
+  }
+  return datos
+}
+
+const api = {
+  login: (d) => request('/auth/login', { method: 'POST', body: d }),
+  register: (d) => request('/auth/register', { method: 'POST', body: d }),
+  getMesas: () => request('/mesas'),
+  crearMesa: (d) => request('/mesas', { method: 'POST', body: d }),
+  actualizarMesa: (id, d) => request(`/mesas/${id}`, { method: 'PUT', body: d }),
+  desactivarMesa: (id) => request(`/mesas/${id}`, { method: 'PATCH' }),
+  getReservaciones: () => request('/reservaciones'),
+  crearReservacion: (d) => request('/reservaciones', { method: 'POST', body: d }),
+  actualizarReservacion: (id, d) => request(`/reservaciones/${id}`, { method: 'PUT', body: d }),
+  cancelarReservacion: (id) => request(`/reservaciones/${id}`, { method: 'PATCH' })
+}
+
+/* ========== Sesión (lee el rol que viene dentro del token) ========== */
+function decodeToken(token) {
+  try {
+    const b64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const json = decodeURIComponent(
+      atob(b64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+    )
+    return JSON.parse(json)
+  } catch { return null }
+}
+const sesionVigente = (u) => Boolean(u && u.exp * 1000 > Date.now())
+
+/* ========== Login ========== */
+function Login({ onLogin, avisar }) {
+  const [modo, setModo] = useState('login')
+  const [form, setForm] = useState({ nombre: '', correo: '', password: '' })
+  const [enviando, setEnviando] = useState(false)
+  const [error, setError] = useState('')
+  const cambiar = (campo) => (e) => setForm({ ...form, [campo]: e.target.value })
+  const esRegistro = modo === 'registro'
+
+  async function enviar(e) {
+    e.preventDefault()
+    setError('')
+    setEnviando(true)
+    try {
+      if (esRegistro) {
+        await api.register({ nombre: form.nombre, correo: form.correo, password: form.password })
+        avisar('ok', 'Cuenta creada. Ya puedes iniciar sesión.')
+        setModo('login')
+        setForm({ ...form, nombre: '', password: '' })
+      } else {
+        const datos = await api.login({ correo: form.correo, password: form.password })
+        onLogin(datos.token)
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <div className="login-pagina">
+      <div className="login-caja panel">
+        <div className="marca-mesas" aria-hidden="true">
+          <span className="forma chica" /><span className="forma media" /><span className="forma grande" />
+        </div>
+        <h1>{esRegistro ? 'Crear cuenta' : 'Iniciar sesión'}</h1>
+        <p className="suave">{esRegistro ? 'Las cuentas nuevas son de cliente.' : 'Entra para ver las mesas y las reservaciones.'}</p>
+        <form onSubmit={enviar}>
+          {esRegistro && (
+            <div className="campo">
+              <label htmlFor="nombre">Nombre</label>
+              <input id="nombre" value={form.nombre} onChange={cambiar('nombre')} required />
+            </div>
+          )}
+          <div className="campo">
+            <label htmlFor="correo">Correo</label>
+            <input id="correo" type="email" value={form.correo} onChange={cambiar('correo')} required />
+          </div>
+          <div className="campo">
+            <label htmlFor="password">Contraseña</label>
+            <input id="password" type="password" value={form.password} onChange={cambiar('password')} required />
+          </div>
+          {error && <p className="error-form" role="alert">{error}</p>}
+          <button className="btn ancho" disabled={enviando}>
+            {enviando ? 'Enviando…' : esRegistro ? 'Crear cuenta' : 'Iniciar sesión'}
+          </button>
+        </form>
+        <button type="button" className="enlace" onClick={() => { setError(''); setModo(esRegistro ? 'login' : 'registro') }}>
+          {esRegistro ? 'Ya tengo cuenta' : 'Crear una cuenta nueva'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ========== Mesas ========== */
+const formaDe = (cap) => (cap <= 2 ? 'chica' : cap <= 4 ? 'media' : 'grande')
+const mesaVacia = { numero: '', capacidad: '', disponible: true }
+
+function Mesas({ usuario, avisar, manejarError }) {
+  const esAdmin = usuario.rol === 'admin'
+  const [mesas, setMesas] = useState(null)
+  const [seleccion, setSeleccion] = useState(null)
+  const [nueva, setNueva] = useState(mesaVacia)
+  const [edicion, setEdicion] = useState(null)
+
+  const cargar = useCallback(async () => {
+    try {
+      const datos = await api.getMesas()
+      setMesas([...datos].sort((a, b) => a.numero - b.numero))
+    } catch (err) {
+      manejarError(err)
+      setMesas([])
+    }
+  }, [manejarError])
+
+  useEffect(() => { cargar() }, [cargar])
+
+  const mesaSel = mesas ? mesas.find((m) => m.id === seleccion) || null : null
+
+  useEffect(() => {
+    setEdicion(mesaSel ? { numero: mesaSel.numero, capacidad: mesaSel.capacidad, disponible: mesaSel.disponible } : null)
+  }, [mesaSel && mesaSel.id, mesaSel && mesaSel.numero, mesaSel && mesaSel.capacidad, mesaSel && mesaSel.disponible])
+
+  async function enviarNueva(e) {
+    e.preventDefault()
+    const numero = Number(nueva.numero)
+    if (mesas.some((m) => m.numero === numero)) {
+      avisar('error', `Ya existe la mesa ${numero}. Elige otro número.`)
+      return
+    }
+    try {
+      await api.crearMesa({ numero, capacidad: Number(nueva.capacidad), disponible: nueva.disponible })
+      avisar('ok', `Mesa ${numero} creada.`)
+      setNueva(mesaVacia)
+      cargar()
+    } catch (err) { manejarError(err) }
+  }
+
+  async function guardarEdicion(e) {
+    e.preventDefault()
+    const numero = Number(edicion.numero)
+    if (mesas.some((m) => m.numero === numero && m.id !== mesaSel.id)) {
+      avisar('error', `Ya existe la mesa ${numero}. Elige otro número.`)
+      return
+    }
+    try {
+      await api.actualizarMesa(mesaSel.id, { numero, capacidad: Number(edicion.capacidad), disponible: edicion.disponible })
+      avisar('ok', 'Cambios guardados.')
+      cargar()
+    } catch (err) { manejarError(err) }
+  }
+
+  async function marcarNoDisponible() {
+    try {
+      await api.desactivarMesa(mesaSel.id)
+      avisar('ok', `Mesa ${mesaSel.numero} marcada como no disponible.`)
+      cargar()
+    } catch (err) { manejarError(err) }
+  }
+
+  return (
+    <>
+      <div className="titulo-fila">
+        <h1>Mesas</h1>
+        <ul className="leyenda">
+          <li><span className="muestra" /> Disponible</li>
+          <li><span className="muestra no" /> No disponible</li>
+        </ul>
+      </div>
+
+      {esAdmin && (
+        <section className="panel" aria-labelledby="nueva-mesa">
+          <h2 id="nueva-mesa">Agregar mesa</h2>
+          <form className="fila-form" onSubmit={enviarNueva}>
+            <div className="campo">
+              <label htmlFor="n-numero">Número</label>
+              <input id="n-numero" type="number" min="1" value={nueva.numero} onChange={(e) => setNueva({ ...nueva, numero: e.target.value })} required />
+            </div>
+            <div className="campo">
+              <label htmlFor="n-cap">Capacidad</label>
+              <input id="n-cap" type="number" min="1" value={nueva.capacidad} onChange={(e) => setNueva({ ...nueva, capacidad: e.target.value })} required />
+            </div>
+            <label className="check">
+              <input type="checkbox" checked={nueva.disponible} onChange={(e) => setNueva({ ...nueva, disponible: e.target.checked })} />
+              Disponible
+            </label>
+            <button className="btn">Agregar mesa</button>
+          </form>
+        </section>
+      )}
+
+      <div className="mesas-layout">
+        <section aria-label="Plano de mesas">
+          {mesas === null ? (
+            <p className="suave">Cargando mesas…</p>
+          ) : mesas.length === 0 ? (
+            <div className="vacio panel">
+              <p>No hay mesas registradas.</p>
+              <p className="suave">{esAdmin ? 'Agrega la primera con el formulario de arriba.' : 'El personal del restaurante todavía no las ha creado.'}</p>
+            </div>
+          ) : (
+            <div className="plano">
+              {mesas.map((m) => (
+                <button
+                  key={m.id}
+                  className={`mesa ${formaDe(m.capacidad)} ${m.disponible ? '' : 'no'}`}
+                  aria-pressed={seleccion === m.id}
+                  onClick={() => setSeleccion(seleccion === m.id ? null : m.id)}
+                  aria-label={`Mesa ${m.numero}, ${m.capacidad} personas, ${m.disponible ? 'disponible' : 'no disponible'}`}
+                >
+                  <strong>{m.numero}</strong>
+                  <small>{m.capacidad} personas</small>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <aside className="panel detalle" aria-live="polite">
+          {!mesaSel ? (
+            <p className="suave">Elige una mesa del plano para ver sus detalles.</p>
+          ) : (
+            <>
+              <h2>Mesa {mesaSel.numero}</h2>
+              <p>
+                Capacidad para {mesaSel.capacidad} personas.{' '}
+                <strong className={mesaSel.disponible ? 'txt-ok' : 'txt-no'}>{mesaSel.disponible ? 'Disponible' : 'No disponible'}</strong>
+              </p>
+              {mesaSel.disponible && <button className="btn peligro" onClick={marcarNoDisponible}>Marcar como no disponible</button>}
+
+              {esAdmin && edicion && (
+                <form onSubmit={guardarEdicion} className="editar">
+                  <h3>Editar mesa</h3>
+                  <div className="campo">
+                    <label htmlFor="e-numero">Número</label>
+                    <input id="e-numero" type="number" min="1" value={edicion.numero} onChange={(e) => setEdicion({ ...edicion, numero: e.target.value })} required />
+                  </div>
+                  <div className="campo">
+                    <label htmlFor="e-cap">Capacidad</label>
+                    <input id="e-cap" type="number" min="1" value={edicion.capacidad} onChange={(e) => setEdicion({ ...edicion, capacidad: e.target.value })} required />
+                  </div>
+                  <label className="check">
+                    <input type="checkbox" checked={edicion.disponible} onChange={(e) => setEdicion({ ...edicion, disponible: e.target.checked })} />
+                    Disponible
+                  </label>
+                  <button className="btn">Guardar cambios</button>
+                </form>
+              )}
+            </>
+          )}
+        </aside>
+      </div>
+    </>
+  )
+}
+
+/* ========== Reservaciones ========== */
+const ESTADOS = ['pendiente', 'confirmada', 'cancelada']
+const fechaISO = (v) => v.slice(0, 10)
+const horaHM = (v) => v.slice(11, 16)
+const fechaLarga = (v) =>
+  new Date(`${fechaISO(v)}T12:00:00`).toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+const mayus = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+
+function Reservaciones({ usuario, avisar, manejarError }) {
+  const esAdmin = usuario.rol === 'admin'
+  const formVacio = { fecha: '', hora: '', personas: 2, estado: 'pendiente', mesa_id: '', usuario_id: usuario.id }
+
+  const [lista, setLista] = useState(null)
+  const [mesas, setMesas] = useState([])
+  const [filtro, setFiltro] = useState('todas')
+  const [form, setForm] = useState(formVacio)
+  const [editandoId, setEditandoId] = useState(null)
+  const formRef = useRef(null)
+
+  const cargar = useCallback(async () => {
+    try {
+      const [reservaciones, listaMesas] = await Promise.all([api.getReservaciones(), api.getMesas()])
+      setLista(reservaciones)
+      setMesas([...listaMesas].sort((a, b) => a.numero - b.numero))
+    } catch (err) {
+      manejarError(err)
+      setLista([])
+    }
+  }, [manejarError])
+
+  useEffect(() => { cargar() }, [cargar])
+
+  const numeroDeMesa = (id) => { const m = mesas.find((x) => x.id === id); return m ? m.numero : id }
+
+  const visibles = (lista || [])
+    .filter((r) => esAdmin || r.usuarioId === usuario.id)
+    .filter((r) => filtro === 'todas' || r.estado === filtro)
+    .sort((a, b) => (fechaISO(a.fecha) + horaHM(a.hora)).localeCompare(fechaISO(b.fecha) + horaHM(b.hora)))
+
+  const cambiar = (campo) => (e) => setForm({ ...form, [campo]: e.target.value })
+
+  function empezarEdicion(r) {
+    setEditandoId(r.id)
+    setForm({ fecha: fechaISO(r.fecha), hora: horaHM(r.hora), personas: r.personas, estado: r.estado, mesa_id: r.mesaId, usuario_id: r.usuarioId })
+    if (formRef.current) formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function descartar() {
+    setEditandoId(null)
+    setForm(formVacio)
+  }
+
+  async function guardar(e) {
+    e.preventDefault()
+    const datos = {
+      fecha: form.fecha,
+      hora: form.hora,
+      personas: Number(form.personas),
+      estado: form.estado,
+      usuario_id: Number(form.usuario_id),
+      mesa_id: Number(form.mesa_id)
+    }
+    try {
+      if (editandoId) {
+        await api.actualizarReservacion(editandoId, datos)
+        avisar('ok', 'Reservación actualizada.')
+      } else {
+        await api.crearReservacion(datos)
+        avisar('ok', 'Reservación creada.')
+      }
+      descartar()
+      cargar()
+    } catch (err) { manejarError(err) }
+  }
+
+  async function cancelar(r) {
+    if (!window.confirm(`¿Cancelar la reservación del ${fechaLarga(r.fecha)} a las ${horaHM(r.hora)}?`)) return
+    try {
+      await api.cancelarReservacion(r.id)
+      avisar('ok', 'Reservación cancelada.')
+      cargar()
+    } catch (err) { manejarError(err) }
+  }
+
+  return (
+    <>
+      <div className="titulo-fila">
+        <h1>Reservaciones</h1>
+        <div className="filtros" role="group" aria-label="Filtrar por estado">
+          {['todas', ...ESTADOS].map((f) => (
+            <button key={f} className="filtro" aria-pressed={filtro === f} onClick={() => setFiltro(f)}>
+              {f === 'todas' ? 'Todas' : mayus(f) + 's'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {esAdmin ? (
+        <section className="panel" aria-labelledby="form-reserva" ref={formRef}>
+          <h2 id="form-reserva">{editandoId ? `Editar reservación #${editandoId}` : 'Nueva reservación'}</h2>
+          <form className="fila-form" onSubmit={guardar}>
+            <div className="campo">
+              <label htmlFor="r-fecha">Fecha</label>
+              <input id="r-fecha" type="date" value={form.fecha} onChange={cambiar('fecha')} required />
+            </div>
+            <div className="campo">
+              <label htmlFor="r-hora">Hora</label>
+              <input id="r-hora" type="time" value={form.hora} onChange={cambiar('hora')} required />
+            </div>
+            <div className="campo">
+              <label htmlFor="r-pers">Personas</label>
+              <input id="r-pers" type="number" min="1" value={form.personas} onChange={cambiar('personas')} required />
+            </div>
+            <div className="campo">
+              <label htmlFor="r-mesa">Mesa</label>
+              <select id="r-mesa" value={form.mesa_id} onChange={cambiar('mesa_id')} required>
+                <option value="" disabled>Elige una mesa</option>
+                {mesas.map((m) => (
+                  <option key={m.id} value={m.id}>Mesa {m.numero} · {m.capacidad} personas{m.disponible ? '' : ' (no disponible)'}</option>
+                ))}
+              </select>
+            </div>
+            <div className="campo">
+              <label htmlFor="r-estado">Estado</label>
+              <select id="r-estado" value={form.estado} onChange={cambiar('estado')}>
+                {ESTADOS.map((s) => <option key={s} value={s}>{mayus(s)}</option>)}
+              </select>
+            </div>
+            <div className="campo">
+              <label htmlFor="r-usuario">Id del cliente</label>
+              <input id="r-usuario" type="number" min="1" value={form.usuario_id} onChange={cambiar('usuario_id')} required />
+            </div>
+            <div className="acciones-form">
+              <button className="btn">{editandoId ? 'Guardar cambios' : 'Crear reservación'}</button>
+              {editandoId && <button type="button" className="btn sec" onClick={descartar}>Descartar cambios</button>}
+            </div>
+          </form>
+        </section>
+      ) : (
+        <p className="suave nota">Aquí ves tus reservaciones. El personal del restaurante las crea y las confirma.</p>
+      )}
+
+      {lista === null ? (
+        <p className="suave">Cargando reservaciones…</p>
+      ) : visibles.length === 0 ? (
+        <div className="vacio panel">
+          <p>{filtro === 'todas' ? 'No hay reservaciones todavía.' : `No hay reservaciones ${filtro}s.`}</p>
+          {esAdmin && filtro === 'todas' && <p className="suave">Crea la primera con el formulario de arriba.</p>}
+        </div>
+      ) : (
+        <div className="tabla-envoltura panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Hora</th><th>Mesa</th><th>Personas</th><th>Estado</th>
+                {esAdmin && <th>Cliente</th>}
+                <th><span className="solo-lector">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibles.map((r) => {
+                const puedeCancelar = r.estado !== 'cancelada' && (esAdmin || r.usuarioId === usuario.id)
+                return (
+                  <tr key={r.id}>
+                    <td>{fechaLarga(r.fecha)}</td>
+                    <td>{horaHM(r.hora)}</td>
+                    <td>Mesa {numeroDeMesa(r.mesaId)}</td>
+                    <td>{r.personas}</td>
+                    <td><span className={`estado ${r.estado}`}>{r.estado}</span></td>
+                    {esAdmin && <td>#{r.usuarioId}</td>}
+                    <td className="acciones">
+                      {esAdmin && <button className="btn sec chico" onClick={() => empezarEdicion(r)}>Editar</button>}
+                      {puedeCancelar && <button className="btn peligro chico" onClick={() => cancelar(r)}>Cancelar</button>}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  )
+}
+
+/* ========== App ========== */
+function App() {
+  const [token, setTokenState] = useState(() => getToken())
+  const [vista, setVista] = useState('mesas')
+  const [aviso, setAviso] = useState(null)
+
+  const usuario = token ? decodeToken(token) : null
+  const activa = sesionVigente(usuario)
+
+  useEffect(() => {
+    if (token && !activa) { clearToken(); setTokenState(null) }
+  }, [token, activa])
+
+  useEffect(() => {
+    if (!aviso) return
+    const t = setTimeout(() => setAviso(null), 5000)
+    return () => clearTimeout(t)
+  }, [aviso])
+
+  const avisar = useCallback((tipo, texto) => setAviso({ tipo, texto }), [])
+  const iniciarSesion = (nuevo) => { setToken(nuevo); setTokenState(nuevo); setVista('mesas') }
+  const cerrarSesion = useCallback(() => { clearToken(); setTokenState(null) }, [])
+  const manejarError = useCallback((err) => {
+    if (err.status === 401) {
+      cerrarSesion()
+      avisar('error', 'Tu sesión venció. Inicia sesión de nuevo.')
+    } else {
+      avisar('error', err.message)
+    }
+  }, [cerrarSesion, avisar])
+
+  const avisoVisible = aviso && <div className={`aviso ${aviso.tipo}`} role="status">{aviso.texto}</div>
+
+  if (!activa) {
+    return (<>{avisoVisible}<Login onLogin={iniciarSesion} avisar={avisar} /></>)
+  }
+
+  return (
+    <>
+      {avisoVisible}
+      <header className="topbar">
+        <div className="topbar-in">
+          <span className="marca">Restaurante</span>
+          <nav aria-label="Secciones">
+            <button className="nav-btn" aria-current={vista === 'mesas' ? 'page' : undefined} onClick={() => setVista('mesas')}>Mesas</button>
+            <button className="nav-btn" aria-current={vista === 'reservaciones' ? 'page' : undefined} onClick={() => setVista('reservaciones')}>Reservaciones</button>
+          </nav>
+          <div className="usuario">
+            <span className="usuario-correo">{usuario.correo}</span>
+            <span className={`rol ${usuario.rol}`}>{usuario.rol}</span>
+            <button className="nav-btn" onClick={cerrarSesion}>Salir</button>
+          </div>
+        </div>
+      </header>
+      <main className="contenedor">
+        {vista === 'mesas'
+          ? <Mesas usuario={usuario} avisar={avisar} manejarError={manejarError} />
+          : <Reservaciones usuario={usuario} avisar={avisar} manejarError={manejarError} />}
+      </main>
+    </>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)
+</script>
+</body>
+</html>
